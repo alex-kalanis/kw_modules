@@ -46,17 +46,17 @@ abstract class ATemplate extends \kalanis\kw_templates\ATemplate
     protected function templatePath(): string
     {
         $documentRoot = Config::getPath()->getDocumentRoot() . Config::getPath()->getPathToSystemRoot();
-        $userDir = Config::getPath()->getUser() ? Config::getPath()->getUser() : '' ;
+        $userDir = Config::getPath()->getUser() ?: '' ;
         $defaultStyle = Config::get('Core', 'page.default_style');
         foreach (static::$paths as $path) {
-            $path = sprintf($path,
+            $translatedPath = sprintf($path,
                 DIRECTORY_SEPARATOR, $documentRoot,
                 IPaths::DIR_USER, $userDir,
                 IPaths::DIR_MODULE, $this->moduleName,
                 IPaths::DIR_STYLE, $defaultStyle,
                 'default', $this->getTemplateName(),
                 'dummy', '.htm', '.html');
-            if ($clearPath = realpath($path)) {
+            if ($clearPath = realpath($translatedPath)) {
                 return $clearPath;
             }
         }

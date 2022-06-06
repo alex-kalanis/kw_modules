@@ -25,7 +25,7 @@ class DiLoader implements ILoader
         $this->container = $container;
     }
 
-    public function load(string $module, ?string $constructPath = null, array $constructParams = []): IModule
+    public function load(string $module, ?string $constructPath = null, array $constructParams = []): ?IModule
     {
         $classPath = empty($constructPath) ? $module : sprintf('%s\%s', $module, $constructPath);
         if ($this->container->has($classPath)) {
@@ -35,5 +35,6 @@ class DiLoader implements ILoader
             }
             return $module;
         }
+        return null;
     }
 }

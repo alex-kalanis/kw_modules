@@ -51,19 +51,19 @@ class Support
 
     public static function templateModuleName(string $moduleName): string
     {
-        if (false !== preg_match_all('#([A-Z][a-z0-9]*)#u', $moduleName, $matches)) {
-            return implode('_', array_map('strtoupper', $matches[1]));
+        if (false != preg_match_all('#([A-Z][a-z0-9]*)#u', $moduleName, $matches)) {
+            return implode('_', array_map('mb_strtoupper', $matches[1]));
         } else {
-            return strtoupper($moduleName);
+            return mb_strtoupper($moduleName);
         }
     }
 
     public static function linkModuleName(string $moduleName): string
     {
-        if (false !== preg_match_all('#([A-Z][a-z0-9]*)#u', $moduleName, $matches)) {
-            return implode('-', array_map('strtolower', $matches[1]));
+        if (false != preg_match_all('#([A-Z][a-z0-9]*)#u', $moduleName, $matches)) {
+            return implode('-', array_map('mb_strtolower', $matches[1]));
         } else {
-            return strtoupper($moduleName);
+            return mb_strtolower($moduleName);
         }
     }
 }

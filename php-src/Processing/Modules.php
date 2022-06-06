@@ -3,9 +3,10 @@
 namespace kalanis\kw_modules\Processing;
 
 
-use kalanis\kw_modules\ModuleException;
-use kalanis\kw_modules\Interfaces\IModuleProcessor;
 use kalanis\kw_modules\Interfaces\IModuleRecord;
+use kalanis\kw_modules\Interfaces\Processing\IFormat;
+use kalanis\kw_modules\Interfaces\Processing\IStorage;
+use kalanis\kw_modules\ModuleException;
 
 
 /**
@@ -15,16 +16,26 @@ use kalanis\kw_modules\Interfaces\IModuleRecord;
  */
 class Modules
 {
-    protected $processor = null;
+    /** @var IStorage */
+    protected $storage = null;
+    /** @var IFormat */
+    protected $format = null;
+    /** @var IModuleRecord */
+    protected $baseRecord = null;
+    /** @var IModuleRecord[] */
+    protected $records = [];
 
-    public function __construct(IModuleProcessor $processor)
+    public function __construct(IFormat $format, IStorage $storage, IModuleRecord $baseRecord)
     {
-        $this->processor = $processor;
+        $this->format = $format;
+        $this->storage = $storage;
+        $this->baseRecord = $baseRecord;
     }
 
     public function setLevel(int $level): void
     {
-        $this->processor->setModuleLevel($level);
+        $this->records = [];
+        $this->storage->setModuleLevel($level);
     }
 
     /**
@@ -33,7 +44,8 @@ class Modules
      */
     public function listing(): array
     {
-        return $this->processor->listing();
+        $this->loadOnDemand();
+        return array_keys($this->records);
     }
 
     /**
@@ -42,8 +54,8 @@ class Modules
      */
     public function createNormalized(string $moduleName): void
     {
-        $this->processor->add(Support::normalizeModuleName($moduleName));
-        $this->processor->save();
+        $this->add(Support::normalizeModuleName($moduleName));
+        $this->save();
     }
 
     /**
@@ -52,8 +64,22 @@ class Modules
      */
     public function createDirect(string $moduleName): void
     {
-        $this->processor->add($moduleName);
-        $this->processor->save();
+        $this->add($moduleName);
+        $this->save();
+    }
+
+    /**
+     * @param string $moduleName
+     * @throws ModuleException
+     */
+    protected function add(string $moduleName): void
+    {
+        $this->loadOnDemand();
+        if (!isset($this->records[$moduleName])) {
+            $record = clone $this->baseRecord;
+            $record->setModuleName($moduleName);
+            $this->records[$moduleName] = $record;
+        }
     }
 
     /**
@@ -63,7 +89,7 @@ class Modules
      */
     public function readNormalized(string $moduleName): ?IModuleRecord
     {
-        return $this->processor->get(Support::normalizeModuleName($moduleName));
+        return $this->get(Support::normalizeModuleName($moduleName));
     }
 
     /**
@@ -73,7 +99,18 @@ class Modules
      */
     public function readDirect(string $moduleName): ?IModuleRecord
     {
-        return $this->processor->get($moduleName);
+        return $this->get($moduleName);
+    }
+
+    /**
+     * @param string $moduleName
+     * @return IModuleRecord|null
+     * @throws ModuleException
+     */
+    protected function get(string $moduleName): ?IModuleRecord
+    {
+        $this->loadOnDemand();
+        return $this->records[$moduleName] ?: null ;
     }
 
     /**
@@ -83,8 +120,8 @@ class Modules
      */
     public function updateNormalized(string $moduleName, string $params): void
     {
-        $this->processor->update(Support::normalizeModuleName($moduleName), $params);
-        $this->processor->save();
+        $this->update(Support::normalizeModuleName($moduleName), $params);
+        $this->save();
     }
 
     /**
@@ -94,8 +131,21 @@ class Modules
      */
     public function updateDirect(string $moduleName, string $params): void
     {
-        $this->processor->update($moduleName, $params);
-        $this->processor->save();
+        $this->update($moduleName, $params);
+        $this->save();
+    }
+
+    /**
+     * @param string $moduleName
+     * @param string $params
+     * @throws ModuleException
+     */
+    protected function update(string $moduleName, string $params): void
+    {
+        $this->loadOnDemand();
+        if (isset($this->records[$moduleName])) {
+            $this->records[$moduleName]->updateParams($params);
+        }
     }
 
     /**
@@ -104,8 +154,8 @@ class Modules
      */
     public function deleteNormalized(string $moduleName): void
     {
-        $this->processor->remove(Support::normalizeModuleName($moduleName));
-        $this->processor->save();
+        $this->remove(Support::normalizeModuleName($moduleName));
+        $this->save();
     }
 
     /**
@@ -114,7 +164,52 @@ class Modules
      */
     public function deleteDirect(string $moduleName): void
     {
-        $this->processor->remove($moduleName);
-        $this->processor->save();
+        $this->remove($moduleName);
+        $this->save();
+    }
+
+    /**
+     * @param string $moduleName
+     * @throws ModuleException
+     */
+    protected function remove(string $moduleName): void
+    {
+        $this->loadOnDemand();
+        if (isset($this->records[$moduleName])) {
+            unset($this->records[$moduleName]);
+        }
+    }
+
+    /**
+     * @throws ModuleException
+     */
+    protected function loadOnDemand(): void
+    {
+        if (empty($this->records)) {
+            $records = $this->load();
+            $this->records = array_combine(array_map([$this, 'nameFromRecord'], $records), $records);
+        }
+    }
+
+    public function nameFromRecord(IModuleRecord $record): string
+    {
+        return $record->getModuleName();
+    }
+
+    /**
+     * @return IModuleRecord[]
+     * @throws ModuleException
+     */
+    protected function load(): array
+    {
+        return $this->format->unpack($this->storage->load());
+    }
+
+    /**
+     * @throws ModuleException
+     */
+    protected function save(): void
+    {
+        $this->storage->save($this->format->pack($this->records));
     }
 }

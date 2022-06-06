@@ -6,9 +6,11 @@ namespace kalanis\kw_modules;
 use kalanis\kw_input\Interfaces\IEntry;
 use kalanis\kw_input\Interfaces\IVariables;
 use kalanis\kw_modules\Loaders\KwLoader;
-use kalanis\kw_modules\Processing\FileProcessor;
+use kalanis\kw_modules\Processing\Format\ClearFile;
 use kalanis\kw_modules\Processing\ModuleRecord;
 use kalanis\kw_modules\Processing\Modules;
+use kalanis\kw_modules\Processing\Storage\Storage;
+use kalanis\kw_storage\Storage\Target\Volume;
 
 
 /**
@@ -38,11 +40,16 @@ class Module
     public function __construct(IVariables $inputs, string $moduleDefinitionDir, ?Modules $processor, ?Interfaces\ILoader $loader = null)
     {
         $this->inputs = $inputs;
-        $this->loader = $loader ?: new KwLoader();
+        $this->loader = $loader ?? new KwLoader();
         if (empty($moduleDefinitionDir) && empty($processor)) {
             throw new ModuleException('You must set at least directory with module definitions or the whole processor itself');
         }
-        $this->processor = $processor ?: new Modules(new FileProcessor(new ModuleRecord(), $moduleDefinitionDir));
+        $defaultRecord = new ModuleRecord();
+        $this->processor = $processor ?? new Modules(
+            new ClearFile($defaultRecord),
+            new Storage(new Volume(), $moduleDefinitionDir),
+            $defaultRecord
+        );
     }
 
     /**
@@ -50,9 +57,12 @@ class Module
      * @return $this
      * @throws ModuleException
      */
-    public function process($defaultModule = 'Core'): self
+    public function process(string $defaultModule): self
     {
         $this->module = $this->loader->load($defaultModule, null, [$this->loader, $this->processor]);
+        if (!$this->module) {
+            throw new ModuleException(sprintf('Controller for wanted default module *%s* not found', $defaultModule));
+        }
         $this->module->init($this->inputs, $this->inputs->getInArray(null, [IEntry::SOURCE_EXTERNAL]));
         return $this;
     }

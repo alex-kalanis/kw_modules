@@ -5,7 +5,6 @@ namespace kalanis\kw_modules;
 
 use kalanis\kw_input\Interfaces\IVariables;
 use kalanis\kw_modules\Interfaces\ILoader;
-use kalanis\kw_modules\Interfaces\IModule;
 use kalanis\kw_modules\Interfaces\ISitePart;
 use kalanis\kw_modules\Processing\Modules;
 use kalanis\kw_modules\Processing\Support;
@@ -16,6 +15,13 @@ use kalanis\kw_templates\TemplateException;
  * Class SubModules
  * @package kalanis\kw_modules
  * Parse source template to get submodules
+ *
+ * @todo: prehodit na pouhe tahani modulu z autoloaderu
+ * @todo: vubec rozlozit - protoze je tu moc odpovednosti
+ *     - vyziskane ocekavane moduly
+ *     - parsovani dat ze zdroje
+ *     - init onech modulu
+ *     - flaknuti obsahu modulu zpatky do zdroje
  */
 class SubModules
 {
@@ -52,6 +58,7 @@ class SubModules
                 try {
                     $beginFrom = $template->position($tagOpen);
                 } catch (TemplateException $ex) {
+                    // not found anymore
                     break;
                 }
                 $templateParams = [];
@@ -70,33 +77,24 @@ class SubModules
                 }
 
                 $moduleInfo = $this->moduleProcessor->readNormalized($module);
-                $moduleInfo = $moduleInfo ?: $this->moduleProcessor->readDirect($module);
-                if ($moduleInfo) {
-                    $configParams = Support::paramsIntoArray($moduleInfo->getParams());
-                    $moduleClass = $this->initModule($module, $inputs, [], array_merge(
-                        $sharedParams, $configParams, $templateParams, [ISitePart::KEY_LEVEL => $level]
-                    ));
-                    $moduleClass->process();
-                    $template->change($contentToChange, $moduleClass->output()->output());
+                $moduleInfo = $moduleInfo ?? $this->moduleProcessor->readDirect($module);
+                if (!$moduleInfo) {
+                    continue;
                 }
+                $moduleClass = $this->loader->load($moduleInfo->getModuleName());
+                if (!$moduleClass) {
+                    continue;
+                }
+                $moduleClass->init($inputs, array_merge(
+                    $sharedParams,
+                    Support::paramsIntoArray($moduleInfo->getParams()),
+                    $templateParams,
+                    [ISitePart::KEY_LEVEL => $level]
+                ));
+                $moduleClass->process();
+                $template->change($contentToChange, $moduleClass->output()->output());
             }
         }
         return $template;
-    }
-
-    /**
-     * @param string $module
-     * @param IVariables $inputs
-     * @param mixed[] $constructParams
-     * @param string[] $passedParams
-     * @param string|null $constructPath
-     * @return IModule
-     * @throws ModuleException
-     */
-    public function initModule(string $module, IVariables $inputs, array $constructParams, array $passedParams, ?string $constructPath = null): IModule
-    {
-        $moduleClass = $this->loader->load($module, $constructPath, $constructParams);
-        $moduleClass->init($inputs, $passedParams);
-        return $moduleClass;
     }
 }

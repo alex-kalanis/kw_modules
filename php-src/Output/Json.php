@@ -20,7 +20,11 @@ class Json extends AOutput
 
     public function output(): string
     {
-        header("Content-Type: application/json");
+        if (!headers_sent()) {
+            // @codeCoverageIgnoreStart
+            header("Content-Type: application/json");
+        }
+        // @codeCoverageIgnoreEnd
         return json_encode($this->content);
     }
 }
