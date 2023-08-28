@@ -3,9 +3,8 @@
 namespace kalanis\kw_modules;
 
 
-use kalanis\kw_input\Entries\Entry;
 use kalanis\kw_input\Interfaces\IEntry;
-use kalanis\kw_input\Interfaces\IVariables;
+use kalanis\kw_input\Interfaces\IFiltered;
 
 
 /**
@@ -15,16 +14,16 @@ use kalanis\kw_input\Interfaces\IVariables;
  *
  * __construct() is for DI/class building
  * process() is for that hard work
- * output() is for getting output class
+ * output() is for getting output class/data
  */
-abstract class AModule implements Interfaces\IModule
+abstract class AModule implements Interfaces\Modules\IModule
 {
-    /** @var IVariables */
+    /** @var IFiltered|null */
     protected $inputs = null;
-    /** @var string[]|Entry[] */
+    /** @var array<int|string, bool|float|int|string|array<int|string>> */
     protected $params = [];
 
-    public function init(IVariables $inputs, array $passedParams): void
+    public function init(IFiltered $inputs, array $passedParams): void
     {
         $this->inputs = $inputs;
         $this->params = $passedParams;
@@ -54,6 +53,11 @@ abstract class AModule implements Interfaces\IModule
         return false;
     }
 
+    /**
+     * @param string $key
+     * @param bool|float|int|string|array<int|string>|null $default
+     * @return bool|float|int|string|array<int|string>|null
+     */
     protected function getFromParam(string $key, $default = null)
     {
         return $this->params[$key] ?? $default ;

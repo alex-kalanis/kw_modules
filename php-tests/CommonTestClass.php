@@ -17,7 +17,7 @@ class XStorage implements IKwStorage
 {
     protected $dummy = [];
 
-    public function check(string $key): bool
+    public function canUse(): bool
     {
         return true;
     }
@@ -27,12 +27,12 @@ class XStorage implements IKwStorage
         return isset($this->dummy[$key]);
     }
 
-    public function load(string $key)
+    public function read(string $key)
     {
         return $this->dummy[$key] ?? null ;
     }
 
-    public function save(string $key, $data, ?int $timeout = null): bool
+    public function write(string $key, $data, ?int $timeout = null): bool
     {
         $this->dummy[$key] = $data;
         return true;
@@ -48,7 +48,7 @@ class XStorage implements IKwStorage
 
     public function lookup(string $key): \Traversable
     {
-        yield from [];
+        yield from $this->dummy;
     }
 
     public function increment(string $key): bool
@@ -59,6 +59,11 @@ class XStorage implements IKwStorage
     public function decrement(string $key): bool
     {
         return false;
+    }
+
+    public function isFlat(): bool
+    {
+        return true;
     }
 
     public function removeMulti(array $keys): array

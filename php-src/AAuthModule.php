@@ -3,16 +3,18 @@
 namespace kalanis\kw_modules;
 
 
+use kalanis\kw_accounts\Interfaces\IUser;
 use kalanis\kw_address_handler\Headers;
 use kalanis\kw_address_handler\Redirect;
 use kalanis\kw_auth\Auth;
 use kalanis\kw_auth\AuthException;
 use kalanis\kw_auth\Interfaces\IAuthTree;
-use kalanis\kw_auth\Interfaces\IUser;
-use kalanis\kw_confs\Config;
 use kalanis\kw_input\Interfaces\IEntry;
-use kalanis\kw_modules\Interfaces\IModuleUser;
+use kalanis\kw_locks\LockException;
+use kalanis\kw_modules\Interfaces\Modules\IHasUser;
 use kalanis\kw_modules\Output;
+use kalanis\kw_paths\Stored;
+use kalanis\kw_routed_paths\StoreRouted;
 
 
 /**
@@ -24,11 +26,11 @@ use kalanis\kw_modules\Output;
  * run() is for that hard work when logged in
  * result() is for getting output class
  */
-abstract class AAuthModule extends AModule implements IModuleUser
+abstract class AAuthModule extends AModule implements IHasUser
 {
     /** @var IUser|null */
     protected $user = null;
-    /** @var AuthException|null */
+    /** @var AuthException|LockException|null */
     protected $error = null;
 
     /**
@@ -37,25 +39,38 @@ abstract class AAuthModule extends AModule implements IModuleUser
     public function process(): void
     {
         try {
-            $sources = [IEntry::SOURCE_EXTERNAL, IEntry::SOURCE_CLI, IEntry::SOURCE_POST, IEntry::SOURCE_GET];
+            if (!$this->inputs) {
+                throw new AuthException('Set inputs first!');
+            }
             $authTree = $this->getAuthTree();
-            $authTree->findMethod($this->inputs->getInObject(null, $sources));
+            if (!$authTree) {
+                throw new AuthException('No classes set to authorize against!');
+            }
+            $authTree->findMethod($this->inputs->getInObject(null, $this->getPossibleSources()));
             if ($authTree->getMethod() && $authTree->getMethod()->isAuthorized()) {
                 $this->user = $authTree->getMethod()->getLoggedUser();
-                if (in_array($this->user->getClass(), $this->allowedAccessClasses())) {
+                if ($this->user && in_array($this->user->getClass(), $this->allowedAccessClasses())) {
                     $this->run();
                 } else {
                     throw new AuthException('Restricted access', 405);
                 }
             }
-        } catch (AuthException $ex) {
+        } catch (AuthException | LockException $ex) {
             $this->error = $ex;
         }
     }
 
-    protected function getAuthTree(): IAuthTree
+    protected function getAuthTree(): ?IAuthTree
     {
         return Auth::getTree();
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getPossibleSources(): array
+    {
+        return [IEntry::SOURCE_EXTERNAL, IEntry::SOURCE_CLI, IEntry::SOURCE_POST, IEntry::SOURCE_GET];
     }
 
     /**
@@ -98,7 +113,7 @@ abstract class AAuthModule extends AModule implements IModuleUser
                 $output = new Output\Raw();
                 return $output->setContent('Authorize first');
             } else {
-                $link = new Linking\ExternalLink(Config::getPath());
+                $link = new Linking\ExternalLink(Stored::getPath(), StoreRouted::getPath());
                 new Redirect($link->linkVariant('login'), Redirect::TARGET_TEMPORARY, 5);
                 $output = new Output\Html();
                 return $output->setContent(sprintf('<h1>%s</h1>', 'Authorize first'));

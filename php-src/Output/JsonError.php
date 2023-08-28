@@ -10,9 +10,15 @@ namespace kalanis\kw_modules\Output;
  */
 class JsonError extends AOutput
 {
+    /** @var array<string|int, string|int|float|array<string|int|float|array<string|int|float>>> */
     protected $content = null;
 
-    public function setContent($code, string $message)
+    /**
+     * @param string|int $code
+     * @param string $message
+     * @return $this
+     */
+    public function setContent($code, string $message): self
     {
         $this->content = compact('code', 'message');
         return $this;
@@ -22,9 +28,9 @@ class JsonError extends AOutput
     {
         if (!headers_sent()) {
             // @codeCoverageIgnoreStart
-            header("Content-Type: application/json");
+            header('Content-Type: application/json');
         }
         // @codeCoverageIgnoreEnd
-        return json_encode($this->content);
+        return strval(json_encode($this->content));
     }
 }

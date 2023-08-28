@@ -5,6 +5,8 @@ namespace kalanis\kw_modules\Templates;
 
 use kalanis\kw_confs\Config;
 use kalanis\kw_paths\Interfaces\IPaths;
+use kalanis\kw_paths\Stored;
+use kalanis\kw_routed_paths\StoreRouted;
 use kalanis\kw_templates\Template\TFile;
 use kalanis\kw_templates\TemplateException;
 
@@ -14,9 +16,12 @@ use kalanis\kw_templates\TemplateException;
  * @package kalanis\kw_modules\Templates
  * Basic template system for all module-dependent templates
  * Allows changes in templates done by each user
+ *
+ * @todo: maybe put outside
  */
 abstract class ATemplate extends \kalanis\kw_templates\ATemplate
 {
+    /** @var string[] */
     protected static $paths = [
         '%2$s%1$s%3$s%1$s%4$s%1$s%5$s%1$s%6$s%1$s%7$s%1$s%10$s%12$s', // user self-installed modules
         '%2$s%1$s%3$s%1$s%4$s%1$s%5$s%1$s%6$s%1$s%7$s%1$s%10$s%13$s',
@@ -34,29 +39,31 @@ abstract class ATemplate extends \kalanis\kw_templates\ATemplate
         '%2$s%1$s%7$s%1$s%9$s%1$s%11$s%13$s',
     ];
 
-    protected $moduleName = '';
-    protected $templateName = '';
-
     use TFile;
 
+    /** @var string */
+    protected $moduleName = '';
+    /** @var string */
+    protected $templateName = '';
+
     /**
-     * @return string
      * @throws TemplateException
+     * @return string
      */
     protected function templatePath(): string
     {
-        $documentRoot = Config::getPath()->getDocumentRoot() . Config::getPath()->getPathToSystemRoot();
-        $userDir = Config::getPath()->getUser() ?: '' ;
+        $documentRoot = Stored::getPath() ? Stored::getPath()->getDocumentRoot() . Stored::getPath()->getPathToSystemRoot() : '';
+        $userDir = StoreRouted::getPath() && StoreRouted::getPath()->getUser() ? StoreRouted::getPath()->getUser() : '' ;
         $defaultStyle = Config::get('Core', 'page.default_style');
         foreach (static::$paths as $path) {
-            $translatedPath = sprintf($path,
+            $path = sprintf($path,
                 DIRECTORY_SEPARATOR, $documentRoot,
                 IPaths::DIR_USER, $userDir,
                 IPaths::DIR_MODULE, $this->moduleName,
                 IPaths::DIR_STYLE, $defaultStyle,
                 'default', $this->getTemplateName(),
                 'dummy', '.htm', '.html');
-            if ($clearPath = realpath($translatedPath)) {
+            if ($clearPath = realpath($path)) {
                 return $clearPath;
             }
         }

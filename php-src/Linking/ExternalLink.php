@@ -6,7 +6,7 @@ namespace kalanis\kw_modules\Linking;
 use kalanis\kw_confs\Config;
 use kalanis\kw_paths\Interfaces\IPaths;
 use kalanis\kw_paths\Path;
-use kalanis\kw_paths\Stuff;
+use kalanis\kw_routed_paths\RoutedPath;
 
 
 /**
@@ -28,13 +28,19 @@ class ExternalLink
     const MOD_NORMAL = 'm:'; # show in normal mode
     const MOD_SINGLE = 'ms:'; # show module as single window
 
+    /** @var Path */
     protected $path = null;
+    /** @var RoutedPath */
+    protected $routedPath = null;
+    /** @var bool */
     protected $moreUsers = false;
+    /** @var bool */
     protected $moreLangs = false;
 
-    public function __construct(Path $path, ?bool $moreUsers = null, ?bool $moreLangs = null)
+    public function __construct(Path $path, RoutedPath $routedPath, ?bool $moreUsers = null, ?bool $moreLangs = null)
     {
         $this->path = $path;
+        $this->routedPath = $routedPath;
         $this->moreUsers = is_null($moreUsers) ? boolval(Config::get('Core', 'site.more_users', false)) : $moreUsers ;
         $this->moreLangs = is_null($moreLangs) ? boolval(Config::get('Core', 'page.more_lang', false)) : $moreLangs ;
         $this->connectBy = boolval(Config::get('Core', 'site.use_rewrite', false))
@@ -48,8 +54,9 @@ class ExternalLink
     const PT2 = '&path='; # path is in the middle
     const PT3 = 'index.php?path='; # path goes first
     const PT4 = 'index.php/'; # rewrite by php
-    const PT5 = 'web/'; # rewrite rule by apache // 'web/' - $settings["site"]["fake_dir"]
+    const PT5 = 'web/'; # rewrite rule by apache // 'web/' - $settings['site']['fake_dir']
 
+    /** @var string */
     private $connectBy = self::PT1;
 
     /*
@@ -66,53 +73,16 @@ class ExternalLink
         Returns:
           Correct path
     */
-    public function linkVariant(?string $path=null, string $module="", bool $single=false, string $lang=null): string
+    public function linkVariant(?string $path=null, string $module='', bool $single=false, string $lang=null): string
     {
-        $renderUser = $this->moreUsers ? $this->path->getUser() : "" ;
-        $renderPath = (is_null($path)) ? $this->path->getPath() : $path ;
-        $renderLang = ($this->moreLangs && (is_null($path) || !is_null($lang))) ? ($lang ?: $this->path->getLang()) : '' ;
-        $renderModule = "";
+        $renderUser = $this->moreUsers ? $this->routedPath->getUser() : '' ;
+        $renderPath = (is_null($path)) ? implode(IPaths::SPLITTER_SLASH, $this->routedPath->getPath()) : $path ;
+        $renderLang = ($this->moreLangs && (is_null($path) || !is_null($lang))) ? ($lang ?: $this->routedPath->getLang()) : '' ;
+        $renderModule = '';
         if (strlen($module) > 0) {
             $renderModule = ($single) ? self::MOD_SINGLE : self::MOD_NORMAL ;
             $renderModule .= $module.IPaths::SPLITTER_SLASH;
         }
         return $this->connectBy.$renderModule.$renderUser.$renderLang.$renderPath;
-    }
-
-    /*
-        Function: link_static()
-        output statical (and real) path to file in user dir
-
-        Parametres:
-          $path - string, path to file, if null, more lang add current lang as part of path
-          $addr - boolean, use address
-          $lang - boolean, need system-defined lang
-
-        Returns:
-          Correct path
-    */
-    public function linkStatic(string $path=null, string $addr='', ?string $lang=null): ?string
-    {
-        $pt = (is_null($path)) ? $this->path->getPath() : $path ;
-        $ad = !empty($addr) ? $addr : IPaths::SPLITTER_SLASH ;
-        $langs = ($this->moreLangs && (is_null($path) || ($lang))) ? ($lang ?: $this->path->getLang()) : '' ;
-        $link = $this->path->getUser().$langs.$pt; // full
-//print_r($this);
-//print_r(array($pt,$ad,$link));
-        return (@file_exists($this->path->getDocumentRoot().$this->path->getPathToSystemRoot().$link))
-            ? Stuff::sanitize($ad.$link)
-            : null ;
-    }
-
-    /**
-     * Output statical (and real) path to file in system dirs
-     * @param string $module
-     * @param string $path path to file
-     * @return string|null Correct path
-     */
-    public function linkModule(string $module, string $path): ?string
-    {
-        $link = implode(DIRECTORY_SEPARATOR, [$this->path->getPathToSystemRoot(), IPaths::DIR_MODULE, $module, $path]);
-        return realpath($this->path->getDocumentRoot() . $link) ? $link : null;
     }
 }

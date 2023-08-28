@@ -8,6 +8,7 @@ use kalanis\kw_confs\Config;
 use kalanis\kw_confs\Interfaces\IConf;
 use kalanis\kw_modules\Templates\ATemplate;
 use kalanis\kw_paths\Path;
+use kalanis\kw_paths\Stored;
 use kalanis\kw_templates\TemplateException;
 
 
@@ -17,7 +18,7 @@ class TemplatesTest extends CommonTestClass
     {
         $path = new Path();
         $path->setDocumentRoot(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data');
-        Config::init($path);
+        Stored::init($path);
         Config::loadClass(new XTmplConf());
 
         $lib = new XTemplate();
@@ -29,7 +30,7 @@ class TemplatesTest extends CommonTestClass
     {
         $path = new Path();
         $path->setDocumentRoot(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data');
-        Config::init($path);
+        Stored::init($path);
         Config::loadClass(new XTmplConf());
 
         $this->expectException(TemplateException::class);
@@ -62,6 +63,11 @@ class XNopeTemplate extends ATemplate
 
 class XTmplConf implements IConf
 {
+    public function setPart(string $part): void
+    {
+        // not need
+    }
+
     public function getConfName(): string
     {
         return 'Core';

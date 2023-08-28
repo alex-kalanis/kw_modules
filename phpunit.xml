@@ -56,7 +56,9 @@
             <directory>php-tests/BasicTests</directory>
             <directory>php-tests/LoadersTests</directory>
             <directory>php-tests/OutputsTests</directory>
-            <directory>php-tests/ProcessingTests</directory>
+            <directory>php-tests/ListsTests</directory>
+            <directory>php-tests/ParserTests</directory>
+            <directory>php-tests/MixerTests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
