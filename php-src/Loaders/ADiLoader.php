@@ -28,7 +28,7 @@ abstract class ADiLoader implements ILoader
         $this->container = $container;
     }
 
-    public function load(array $module, array $constructParams = []): IModule
+    public function load(array $module, array $constructParams = []): ?IModule
     {
         $classPath = $this->getClassName($module);
         if ($this->container->has($classPath)) {

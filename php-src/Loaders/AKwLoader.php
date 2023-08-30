@@ -37,17 +37,14 @@ abstract class AKwLoader implements ILoader
         $classPath = $this->getClassName($module);
         try {
             $reflection = new \ReflectionClass($classPath);
-        } catch (AutoloadException | \ReflectionException $ex) {
-            return null;
-        }
-        if ($reflection->isInstantiable()) {
             $module = $reflection->newInstanceArgs($constructParams);
             if (!$module instanceof IModule) {
                 throw new ModuleException(sprintf('Class *%s* is not instance of IModule - check interface or query', $classPath));
             }
             return $module;
+        } catch (AutoloadException | \ReflectionException $ex) {
+            return null;
         }
-        return null;
     }
 
     /**
