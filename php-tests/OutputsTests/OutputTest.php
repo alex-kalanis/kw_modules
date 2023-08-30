@@ -12,7 +12,7 @@ class OutputTest extends CommonTestClass
     public function testBasic(): void
     {
         $lib = new XOutput();
-        $this->assertEquals('dummy output', (string)$lib);
+        $this->assertEquals('dummy output', (string) $lib);
         $this->assertFalse($lib->canWrap());
     }
 
@@ -20,7 +20,7 @@ class OutputTest extends CommonTestClass
     {
         $lib = new Output\Raw();
         $lib->setContent('got everything');
-        $this->assertEquals('got everything', (string)$lib);
+        $this->assertEquals('got everything', (string) $lib);
         $this->assertFalse($lib->canWrap());
     }
 
@@ -28,7 +28,7 @@ class OutputTest extends CommonTestClass
     {
         $lib = new Output\RawCallback();
         $lib->setCallback([$this, 'mockCallback']);
-        $this->assertEquals('from callback', (string)$lib);
+        $this->assertEquals('from callback', (string) $lib);
         $this->assertFalse($lib->canWrap());
     }
 
@@ -36,7 +36,7 @@ class OutputTest extends CommonTestClass
     {
         $lib = new Output\DumpingCallback();
         $lib->setCallback([$this, 'mockCallback']);
-        $this->assertEquals('from callback', (string)$lib);
+        $this->assertEquals('from callback', (string) $lib);
         $this->assertFalse($lib->canWrap());
     }
 
@@ -44,7 +44,7 @@ class OutputTest extends CommonTestClass
     {
         $lib = new Output\Html();
         $lib->setContent('what you want');
-        $this->assertEquals('what you want', (string)$lib);
+        $this->assertEquals('what you want', (string) $lib);
         $this->assertTrue($lib->canWrap());
     }
 
@@ -52,7 +52,7 @@ class OutputTest extends CommonTestClass
     {
         $lib = new Output\Json();
         $lib->setContent(['get' => 'what you want']);
-        $this->assertEquals('{"get":"what you want"}', (string)$lib);
+        $this->assertEquals('{"get":"what you want"}', (string) $lib);
         $this->assertFalse($lib->canWrap());
     }
 
@@ -60,7 +60,7 @@ class OutputTest extends CommonTestClass
     {
         $lib = new Output\JsonError();
         $lib->setContent(987, 'cannot happen');
-        $this->assertEquals('{"code":987,"message":"cannot happen"}', (string)$lib);
+        $this->assertEquals('{"code":987,"message":"cannot happen"}', (string) $lib);
         $this->assertFalse($lib->canWrap());
     }
 

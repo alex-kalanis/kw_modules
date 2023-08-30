@@ -79,7 +79,7 @@ class ExternalLink
         $renderPath = (is_null($path)) ? implode(IPaths::SPLITTER_SLASH, $this->routedPath->getPath()) : $path ;
         $renderLang = ($this->moreLangs && (is_null($path) || !is_null($lang))) ? ($lang ?: $this->routedPath->getLang()) : '' ;
         $renderModule = '';
-        if (strlen($module) > 0) {
+        if (0 < strlen($module)) {
             $renderModule = ($single) ? self::MOD_SINGLE : self::MOD_NORMAL ;
             $renderModule .= $module.IPaths::SPLITTER_SLASH;
         }

@@ -59,6 +59,7 @@ class Factory
         }
         if (is_string($params)) {
             try {
+                /** @var class-string $params */
                 $ref = new \ReflectionClass($params);
                 $class = $ref->newInstanceArgs();
                 if ($class && $class instanceof ILoader) {
@@ -104,6 +105,7 @@ class Factory
         }
         if (is_string($params)) {
             try {
+                /** @var class-string $params */
                 $ref = new \ReflectionClass($params);
                 $class = $ref->newInstance();
                 if ($class && $class instanceof IModulesList) {

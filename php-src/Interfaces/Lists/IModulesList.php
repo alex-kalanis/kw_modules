@@ -33,15 +33,15 @@ interface IModulesList
     /**
      * Get module config from storage
      * @param string $moduleName
-     * @return Record|null
      * @throws ModuleException
+     * @return Record|null
      */
     public function get(string $moduleName): ?Record;
 
     /**
      * Get available modules
-     * @return array<string, Record>
      * @throws ModuleException
+     * @return array<string, Record>
      */
     public function listing(): array;
 
