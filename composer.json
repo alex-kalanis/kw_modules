@@ -22,7 +22,7 @@
         "alex-kalanis/kw_routed_paths": ">=1.0 <2",
         "alex-kalanis/kw_address_handler": ">=2.0 <3",
         "alex-kalanis/kw_auth": ">=4.0 <5",
-        "alex-kalanis/kw_lock": ">=2.0 <3",
+        "alex-kalanis/kw_locks": ">=2.0 <3",
         "alex-kalanis/kw_templates": ">=2.0 <3",
         "psr/container": "=2.0.2",
         "friendsofphp/php-cs-fixer": "^3.0",
