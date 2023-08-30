@@ -61,7 +61,7 @@ class Factory
             try {
                 /** @var class-string $params */
                 $ref = new \ReflectionClass($params);
-                $class = $ref->newInstanceArgs();
+                $class = $ref->newInstance();
                 if ($class && $class instanceof ILoader) {
                     return $class;
                 }
