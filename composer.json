@@ -17,6 +17,7 @@
     },
     "require-dev": {
         "alex-kalanis/kw_files": ">=3.0 <4",
+        "alex-kalanis/kw_storage": ">=4.0 <5",
         "alex-kalanis/kw_mapper": ">=2.0 <3",
         "alex-kalanis/kw_confs": ">=1.0 <2",
         "alex-kalanis/kw_routed_paths": ">=1.0 <2",
