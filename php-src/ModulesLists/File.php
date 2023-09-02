@@ -60,8 +60,7 @@ class File implements IModulesList
     public function listing(): array
     {
         $records = $this->unpack($this->storage->load());
-        $recs = array_combine(array_map([$this, 'getRecordName'], $records), $records);
-        return (false === $recs) ? [] : $recs;
+        return array_combine(array_map([$this, 'getRecordName'], $records), $records);
     }
 
     public function getRecordName(Record $record): string
