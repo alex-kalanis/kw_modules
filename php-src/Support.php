@@ -87,7 +87,7 @@ class Support
 
     public static function templateModuleName(string $moduleName): string
     {
-        if (false != preg_match_all('#([A-Z][a-z0-9]*)#u', $moduleName, $matches)) {
+        if (!empty(preg_match_all('#([A-Z][a-z0-9]*)#u', $moduleName, $matches))) {
             return implode('_', array_map('mb_strtoupper', $matches[1]));
         } else {
             return mb_strtoupper($moduleName);
