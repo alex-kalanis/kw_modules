@@ -5,60 +5,27 @@ namespace BasicTests;
 
 use CommonTestClass;
 use kalanis\kw_modules\Support;
+use kalanis\kw_paths\PathsException;
+use kalanis\kw_paths\Stuff;
 
 
 class SupportTest extends CommonTestClass
 {
     /**
      * @param string $in
-     * @param array $expected
-     * @dataProvider paramsArrayProvider
+     * @param string[] $expected
+     * @throws PathsException
+     * @dataProvider pathFromDirProvider
      */
-    public function testParamsArray(string $in, array $expected): void
+    public function testPathFromDir(string $in, array $expected): void
     {
-        $this->assertEquals($expected, Support::paramsIntoArray($in));
+        $this->assertEquals($expected, Support::modulePathFromDirPath(Stuff::linkToArray($in)));
     }
 
-    public function paramsArrayProvider(): array
+    public function pathFromDirProvider(): array
     {
         return [
-            ['foo=bar', ['foo' => 'bar']],
-            ['foo=bar&baz=eab', ['foo' => 'bar', 'baz' => 'eab']],
-        ];
-    }
-
-    /**
-     * @param array $in
-     * @param string $expected
-     * @dataProvider paramsStringProvider
-     */
-    public function testParamsString(array $in, string $expected): void
-    {
-        $this->assertEquals($expected, Support::paramsIntoString($in));
-    }
-
-    public function paramsStringProvider(): array
-    {
-        return [
-            [ ['foo' => 'bar'], 'foo=bar' ],
-            [ ['foo' => 'bar', 'baz' => 'eab'], 'foo=bar&baz=eab' ],
-        ];
-    }
-
-    /**
-     * @param string $in
-     * @param string $expected
-     * @dataProvider normalizeNamespacedProvider
-     */
-    public function testNormalizeNamespaced(string $in, string $expected): void
-    {
-        $this->assertEquals($expected, Support::normalizeNamespacedName($in));
-    }
-
-    public function normalizeNamespacedProvider(): array
-    {
-        return [
-            ['/foo/../bar-baz/.', 'Foo\BarBaz'],
+            ['/foo/../bar-baz/.', ['Foo', 'BarBaz']],
         ];
     }
 
@@ -67,16 +34,17 @@ class SupportTest extends CommonTestClass
      * @param string[] $expected
      * @dataProvider nameFromTemplateProvider
      */
-    public function testNameFromTemplate(string $in, array $expected): void
+    public function testPathFromTemplate(string $in, array $expected): void
     {
-        $this->assertEquals($expected, Support::moduleNameFromTemplate($in));
+        $this->assertEquals($expected, Support::modulePathFromTemplate($in));
+        $this->assertEquals($in, Support::templatePathForModule($expected));
     }
 
     public function nameFromTemplateProvider(): array
     {
         return [
-            ['whatever-for-name', ['WhateverForName']],
-            ['whatever--for--name', ['Whatever', 'For', 'Name']],
+            ['WHATEVER_FOR_NAME', ['WhateverForName']],
+            ['WHATEVER__FOR__NAME', ['Whatever', 'For', 'Name']],
         ];
     }
 
@@ -131,25 +99,6 @@ class SupportTest extends CommonTestClass
             ['FooBar0Baz', 'FOO_BAR0_BAZ'],
             ['Nope-Yep', 'NOPE_YEP'],
             ['Αθήνα', 'ΑΘΉΝΑ'], // not ASCII
-        ];
-    }
-
-    /**
-     * @param string $in
-     * @param string $expected
-     * @dataProvider normalizeLinkProvider
-     */
-    public function testLinkModule(string $in, string $expected): void
-    {
-        $this->assertEquals($expected, Support::linkModuleName($in));
-    }
-
-    public function normalizeLinkProvider(): array
-    {
-        return [
-            ['FooBar0Baz', 'foo-bar0-baz'],
-            ['Nope-Yep', 'nope-yep'],
-            ['Θεσσαλονίκη', 'θεσσαλονίκη'], // not ASCII
         ];
     }
 }

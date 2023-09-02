@@ -4,7 +4,7 @@ namespace kalanis\kw_modules\ModulesLists\ParamsFormat;
 
 
 use kalanis\kw_modules\Interfaces\Lists\File\IParamFormat;
-use kalanis\kw_modules\Support;
+use kalanis\kw_paths\Stuff;
 
 
 /**
@@ -15,11 +15,11 @@ class Http implements IParamFormat
 {
     public function pack(array $data): string
     {
-        return Support::paramsIntoString($data);
+        return Stuff::arrayIntoHttpString($data);
     }
 
     public function unpack(string $content): array
     {
-        return Support::paramsIntoArray($content);
+        return Stuff::httpStringIntoArray($content);
     }
 }

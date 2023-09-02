@@ -19,6 +19,7 @@ class Json implements IParamFormat
 
     public function unpack(string $content): array
     {
-        return (array) json_decode($content, true);
+        $data = @ json_decode($content, true);
+        return (false === $data) ? [] : $data ;
     }
 }

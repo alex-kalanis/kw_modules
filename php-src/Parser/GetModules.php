@@ -5,6 +5,7 @@ namespace kalanis\kw_modules\Parser;
 
 use kalanis\kw_modules\ModuleException;
 use kalanis\kw_modules\Support;
+use kalanis\kw_paths\Stuff;
 
 
 /**
@@ -109,12 +110,12 @@ class GetModules
                 $paramLen = $rest[$i]->getPos() - $paramStart;
                 $changeLen = $rest[$i]->getPos() + strlen($rest[$i]->getBraced()) - $top->getPos();
 
-                $parts = Support::moduleNameFromTemplate(Support::clearModuleName($top->getInner()));
+                $parts = Support::modulePathFromTemplate(Support::clearModuleName($top->getInner()));
                 $readParams = substr($this->content, $paramStart, $paramLen);
                 $toChange = substr($this->content, $top->getPos(), $changeLen);
 //print_r(['proc', $parts, $readParams, $toChange]);
                 $rec = new Record();
-                $rec->setParams(Support::paramsIntoArray($readParams));
+                $rec->setParams(Stuff::httpStringIntoArray($readParams));
                 $rec->setModuleName(strval(reset($parts)));
                 $rec->setModulePath($parts);
                 $rec->setContentToChange($toChange);
@@ -167,7 +168,7 @@ class GetModules
 
     protected function filteredSoloIntoRecord(Positioned $entry): Record
     {
-        $parts = Support::moduleNameFromTemplate(Support::clearModuleName($entry->getInner()));
+        $parts = Support::modulePathFromTemplate(Support::clearModuleName($entry->getInner()));
         $rec = new Record();
         $rec->setModuleName(strval(reset($parts)));
         $rec->setModulePath($parts);

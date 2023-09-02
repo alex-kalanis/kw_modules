@@ -6,7 +6,7 @@ namespace LoadersTests;
 use CommonTestClass;
 use kalanis\kw_input\Interfaces\IFiltered;
 use kalanis\kw_modules\Interfaces\ILoader;
-use kalanis\kw_modules\Interfaces\Modules\IModule;
+use kalanis\kw_modules\Interfaces\IModule;
 use kalanis\kw_modules\Loaders\ClassLoader;
 use kalanis\kw_modules\Loaders\TSeparate;
 use kalanis\kw_modules\ModuleException;

@@ -59,6 +59,8 @@
             <directory>php-tests/ListsTests</directory>
             <directory>php-tests/ParserTests</directory>
             <directory>php-tests/MixerTests</directory>
+            <directory>php-tests/AccessTests</directory>
+            <directory>php-tests/TraitsTests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

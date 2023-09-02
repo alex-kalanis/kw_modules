@@ -19,6 +19,7 @@ class Serialize implements IParamFormat
 
     public function unpack(string $content): array
     {
-        return (array) unserialize($content);
+        $data = @ unserialize($content);
+        return (false === $data) ? [] : $data ;
     }
 }

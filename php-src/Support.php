@@ -14,55 +14,41 @@ use kalanis\kw_paths;
 class Support
 {
     /**
-     * @param string $param
-     * @return array<string|int, string|int|float|bool|array<string|int>>
+     * Get module from some preset path
+     * @param string[] $modulePath
+     * @return string[]
      */
-    public static function paramsIntoArray(string $param): array
+    public static function modulePathFromDirPath(array $modulePath): array
     {
-        parse_str($param, $result);
-        return $result;
-    }
-
-    /**
-     * @param array<string|int, string|int|float|bool|array<string|int>> $param
-     * @return string
-     */
-    public static function paramsIntoString(array $param): string
-    {
-        return http_build_query($param);
-    }
-
-    public static function normalizeNamespacedName(string $moduleName): string
-    {
-        return implode('\\', // MUST be backslashes!! - translate to class name
-            array_map('ucfirst',
-                array_map(['\kalanis\kw_modules\Support', 'normalizeModuleName'],
+        return array_values(array_map('ucfirst',
+            array_map([self::class, 'normalizeModuleName'],
+                array_filter(
                     array_filter(
-                        array_filter(
-                            kw_paths\Stuff::linkToArray($moduleName)
-                        ), ['\kalanis\kw_paths\Stuff', 'notDots']
-                    )
+                        $modulePath
+                    ), [kw_paths\Stuff::class, 'notDots']
                 )
             )
-        );
+        ));
     }
 
     /**
+     * Get module from template format
+     * {SOMETHING_NAMED__UNDER__PATH}
      * @param string $name
      * @return string[]
      */
-    public static function moduleNameFromTemplate(string $name): array
+    public static function modulePathFromTemplate(string $name): array
     {
-        return array_map(
+        return array_values(array_map(
             'ucfirst',
             array_map(
-                ['\kalanis\kw_modules\Support', 'normalizeModuleName'],
+                [self::class, 'normalizeTemplateModuleName'],
                 array_map(
                     'strtolower',
-                    explode('--', $name)
+                    explode('__', $name)
                 )
             )
-        );
+        ));
     }
 
     public static function clearModuleName(string $name): string
@@ -72,12 +58,31 @@ class Support
 
     public static function normalizeModuleName(string $moduleName): string
     {
-        return implode('', array_map(['\kalanis\kw_modules\Support', 'moduleNamePart'], explode('-', $moduleName)));
+        return implode('', array_map([self::class, 'moduleNamePart'], explode('-', $moduleName)));
+    }
+
+    public static function normalizeTemplateModuleName(string $moduleName): string
+    {
+        return implode('', array_map([self::class, 'moduleNamePart'], explode('_', $moduleName)));
     }
 
     public static function moduleNamePart(string $moduleName): string
     {
         return ucfirst(strtolower($moduleName));
+    }
+
+    /**
+     * @param string[] $path
+     * @return string
+     * Reverse for
+     * @see \kalanis\kw_modules\Support::modulePathFromTemplate
+     */
+    public static function templatePathForModule(array $path): string
+    {
+        return strval(implode(
+            '__',
+            array_map([self::class, 'templateModuleName'], $path)
+        ));
     }
 
     public static function templateModuleName(string $moduleName): string
@@ -86,15 +91,6 @@ class Support
             return implode('_', array_map('mb_strtoupper', $matches[1]));
         } else {
             return mb_strtoupper($moduleName);
-        }
-    }
-
-    public static function linkModuleName(string $moduleName): string
-    {
-        if (false != preg_match_all('#([A-Z][a-z0-9]*)#u', $moduleName, $matches)) {
-            return implode('-', array_map('mb_strtolower', $matches[1]));
-        } else {
-            return mb_strtolower($moduleName);
         }
     }
 }

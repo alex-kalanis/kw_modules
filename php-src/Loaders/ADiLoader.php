@@ -4,7 +4,7 @@ namespace kalanis\kw_modules\Loaders;
 
 
 use kalanis\kw_modules\Interfaces\ILoader;
-use kalanis\kw_modules\Interfaces\Modules\IModule;
+use kalanis\kw_modules\Interfaces\IModule;
 use kalanis\kw_modules\ModuleException;
 use Psr\Container\ContainerInterface;
 

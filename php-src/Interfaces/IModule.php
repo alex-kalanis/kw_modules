@@ -1,6 +1,6 @@
 <?php
 
-namespace kalanis\kw_modules\Interfaces\Modules;
+namespace kalanis\kw_modules\Interfaces;
 
 
 use kalanis\kw_input\Interfaces\IFiltered;
@@ -10,7 +10,7 @@ use kalanis\kw_modules\Output\AOutput;
 
 /**
  * Class IModule
- * @package kalanis\kw_modules\Interfaces\Modules
+ * @package kalanis\kw_modules\Interfaces
  * Module interface
  */
 interface IModule

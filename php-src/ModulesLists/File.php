@@ -7,7 +7,7 @@ use kalanis\kw_modules\Interfaces\Lists\IModulesList;
 use kalanis\kw_modules\Interfaces\Lists\File\IParamFormat;
 use kalanis\kw_modules\Interfaces\Lists\IFile;
 use kalanis\kw_modules\ModuleException;
-use kalanis\kw_modules\Support;
+use kalanis\kw_paths\Stuff;
 
 
 /**
@@ -136,7 +136,7 @@ class File implements IModulesList
         return implode(static::PARAM_SEPARATOR, [
             $record->getModuleName(),
             strval(intval($record->isEnabled())),
-            Support::paramsIntoString($record->getParams()),
+            Stuff::arrayIntoHttpString($record->getParams()),
             ''
         ]);
     }
@@ -163,7 +163,7 @@ class File implements IModulesList
         $record = new Record();
         $record->setModuleName($name);
         $record->setEnabled(boolval(intval(strval($enabled))));
-        $record->setParams(Support::paramsIntoArray($params));
+        $record->setParams(Stuff::httpStringIntoArray($params));
         return $record;
     }
 }

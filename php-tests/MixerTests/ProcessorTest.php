@@ -30,10 +30,10 @@ class ProcessorTest extends CommonTestClass
     public function testSimple(): void
     {
         $lib = $this->getLib();
-        $content = 'blablabla {MODULE/} blablabla {OTHER-DATA/} blablabla {ANOTHER--DATA/} blablabla';
+        $content = 'blablabla {MODULE/} blablabla {OTHER_DATA/} blablabla {ANOTHER__DATA/} blablabla {CHANGES-LEFT/}';
 
         $this->assertEquals(
-            'blablabla dummy1 blablabla {OTHER-DATA/} blablabla dummy2 blablabla',
+            'blablabla dummy1 blablabla {OTHER_DATA/} blablabla dummy2 blablabla {CHANGES-LEFT/}',
             $lib->fill($content, $this->getFilter(), 99)
         );
     }
@@ -44,7 +44,7 @@ class ProcessorTest extends CommonTestClass
     public function testWithParamsAndNotUse(): void
     {
         $lib = $this->getLib();
-        $content = 'blablabla{MODULE}foo=bar&abc=def&ghi=12.5{/MODULE}blablabla {NOT-USE}bar=ghi{/NOT-USE} blablabla';
+        $content = 'blablabla{MODULE}foo=bar&abc=def&ghi=12.5{/MODULE}blablabla {NOT_USE}bar=ghi{/NOT_USE} blablabla';
 
         $this->assertEquals(
             'blablabladummy1blablabla  blablabla',
@@ -66,7 +66,7 @@ class ProcessorTest extends CommonTestClass
 
 class XLoader implements Interfaces\ILoader
 {
-    public function load(array $module, array $constructParams = []): ?Interfaces\Modules\IModule
+    public function load(array $module, array $constructParams = []): ?Interfaces\IModule
     {
         $which = strval(reset($module));
         switch ($which) {
@@ -83,7 +83,7 @@ class XLoader implements Interfaces\ILoader
 }
 
 
-class DummyOne implements Interfaces\Modules\IModule
+class DummyOne implements Interfaces\IModule
 {
     public function init(IFiltered $inputs, array $passedParams): void
     {
@@ -102,7 +102,7 @@ class DummyOne implements Interfaces\Modules\IModule
 }
 
 
-class DummyTwo implements Interfaces\Modules\IModule
+class DummyTwo implements Interfaces\IModule
 {
     public function init(IFiltered $inputs, array $passedParams): void
     {
@@ -121,7 +121,7 @@ class DummyTwo implements Interfaces\Modules\IModule
 }
 
 
-class DummyThree implements Interfaces\Modules\IModule
+class DummyThree implements Interfaces\IModule
 {
     public function init(IFiltered $inputs, array $passedParams): void
     {

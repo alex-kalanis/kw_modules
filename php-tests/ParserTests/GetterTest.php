@@ -28,7 +28,7 @@ class GetterTest extends CommonTestClass
     public function testSimple(): void
     {
         $lib = new GetModules();
-        $lib->setContent('blablabla {MODULE/} blablabla {OTHER-DATA/} blablabla {ANOTHER--DATA/} blablabla');
+        $lib->setContent('blablabla {MODULE/} blablabla {OTHER_DATA/} blablabla {ANOTHER__DATA/} blablabla');
         $modules = $lib->process()->getFoundModules();
         $this->assertNotEmpty($modules);
 
@@ -44,14 +44,14 @@ class GetterTest extends CommonTestClass
         $this->assertEquals('OtherData', $module->getModuleName());
         $this->assertEquals(['OtherData'], $module->getModulePath());
         $this->assertEquals([], $module->getParams());
-        $this->assertEquals('{OTHER-DATA/}', $module->getToChange());
+        $this->assertEquals('{OTHER_DATA/}', $module->getToChange());
 
         $module = next($modules);
         /** @var Record $module */
         $this->assertEquals('Another', $module->getModuleName());
         $this->assertEquals(['Another', 'Data'], $module->getModulePath());
         $this->assertEquals([], $module->getParams());
-        $this->assertEquals('{ANOTHER--DATA/}', $module->getToChange());
+        $this->assertEquals('{ANOTHER__DATA/}', $module->getToChange());
 
         $this->assertEmpty(next($modules));
     }
@@ -82,8 +82,8 @@ class GetterTest extends CommonTestClass
     {
         $lib = new GetModules();
         $lib->setContent('blablabla{MODULE}foo=bar&abc=def&ghi=12.5{/MODULE}blablabla
-        blablabla blablabla {OTHER-DATA}foo=def&abc=75{/OTHER-DATA} blablabla
-        {ANOTHER--DATA}bar=def{/ANOTHER--DATA} blablabla');
+        blablabla blablabla {OTHER_DATA}foo=def&abc=75{/OTHER_DATA} blablabla
+        {ANOTHER__DATA}bar=def{/ANOTHER__DATA} blablabla {CHANGE-LEFT}{/CHANGE-LEFT}');
         $modules = $lib->process()->getFoundModules();
         $this->assertNotEmpty($modules);
 
@@ -98,14 +98,21 @@ class GetterTest extends CommonTestClass
         $this->assertEquals('OtherData', $module->getModuleName());
         $this->assertEquals(['OtherData'], $module->getModulePath());
         $this->assertEquals(['foo' => 'def', 'abc' => '75'], $module->getParams());
-        $this->assertEquals('{OTHER-DATA}foo=def&abc=75{/OTHER-DATA}', $module->getToChange());
+        $this->assertEquals('{OTHER_DATA}foo=def&abc=75{/OTHER_DATA}', $module->getToChange());
 
         $module = next($modules);
         /** @var Record $module */
         $this->assertEquals('Another', $module->getModuleName());
         $this->assertEquals(['Another', 'Data'], $module->getModulePath());
         $this->assertEquals(['bar' => 'def'], $module->getParams());
-        $this->assertEquals('{ANOTHER--DATA}bar=def{/ANOTHER--DATA}', $module->getToChange());
+        $this->assertEquals('{ANOTHER__DATA}bar=def{/ANOTHER__DATA}', $module->getToChange());
+
+        $module = next($modules);
+        /** @var Record $module */
+        $this->assertEquals('Change-left', $module->getModuleName());
+        $this->assertEquals(['Change-left'], $module->getModulePath());
+        $this->assertEquals([], $module->getParams());
+        $this->assertEquals('{CHANGE-LEFT}{/CHANGE-LEFT}', $module->getToChange());
 
         $this->assertEmpty(next($modules));
     }

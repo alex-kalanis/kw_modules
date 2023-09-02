@@ -3,15 +3,23 @@
 namespace kalanis\kw_modules\Access;
 
 
+use kalanis\kw_files\Access\Factory as files_factory;
+use kalanis\kw_files\FilesException;
+use kalanis\kw_files\Interfaces\IFLTranslations;
 use kalanis\kw_files\Interfaces\IProcessFiles;
-use kalanis\kw_mapper\MapperException;
 use kalanis\kw_modules\Interfaces\ILoader;
+use kalanis\kw_modules\Interfaces\Lists\File\IParamFormat;
 use kalanis\kw_modules\Interfaces\Lists\IModulesList;
+use kalanis\kw_modules\ModuleException;
 use kalanis\kw_modules\ModulesLists\File;
 use kalanis\kw_modules\ModulesLists\ParamsFormat;
 use kalanis\kw_modules\Loaders;
 use kalanis\kw_modules\Mixer\Processor;
+use kalanis\kw_paths\PathsException;
+use kalanis\kw_storage\Access\Factory as storage_factory;
 use kalanis\kw_storage\Interfaces\IStorage;
+use kalanis\kw_storage\Interfaces\IStTranslations;
+use kalanis\kw_storage\StorageException;
 
 
 /**
@@ -23,17 +31,17 @@ class Factory
 {
     /**
      * @param mixed $params
-     * @throws MapperException
+     * @throws ModuleException
      * @return Processor
      */
     public function getProcessor($params): Processor
     {
-        return new Processor($this->getLoader($params), $this->getSourceList($params));
+        return new Processor($this->getLoader($params), $this->getModulesList($params));
     }
 
     /**
      * @param mixed $params
-     * @throws MapperException
+     * @throws ModuleException
      * @return ILoader
      */
     public function getLoader($params): ILoader
@@ -51,7 +59,7 @@ class Factory
             foreach (array_values($params) as $item) {
                 try {
                     $what[] = $this->getLoader($item);
-                } catch (MapperException $ex) {
+                } catch (ModuleException $ex) {
                     // not found - pass
                 }
             }
@@ -77,15 +85,15 @@ class Factory
                     return new Loaders\KwLoader();
             }
         }
-        throw new MapperException('No loader set!');
+        throw new ModuleException('No loader set!');
     }
 
     /**
      * @param mixed $params
-     * @throws MapperException
+     * @throws ModuleException
      * @return IModulesList
      */
-    public function getSourceList($params): IModulesList
+    public function getModulesList($params): IModulesList
     {
         if (is_object($params)) {
             if ($params instanceof IModulesList) {
@@ -100,7 +108,20 @@ class Factory
         }
         if (is_array($params)) {
             if (isset($params['modules_source'])) {
-                return $this->getSourceList($params['modules_source']);
+                return $this->getModulesList($params['modules_source']);
+            }
+            try {
+                $format = isset($params['modules_param_format']) ? $this->getFormat($params['modules_param_format']) : new ParamsFormat\Http();
+                if (isset($params['storage_path'])) {
+                    $lang = isset($params['lang']) && is_object($params['lang']) && ($params['lang'] instanceof IStTranslations) ? $params['lang'] : null;
+                    return new File(new File\Storage((new storage_factory($lang))->getStorage($params), $params['storage_path']), $format);
+                }
+                if (isset($params['files_path'])) {
+                    $lang = isset($params['lang']) && is_object($params['lang']) && ($params['lang'] instanceof IFLTranslations) ? $params['lang'] : null;
+                    return new File(new File\Files((new files_factory($lang))->getClass($params), $params['files_path']), $format);
+                }
+            } catch (FilesException | PathsException | StorageException $ex) {
+                throw new ModuleException($ex->getMessage(), $ex->getCode(), $ex);
             }
         }
         if (is_string($params)) {
@@ -116,6 +137,25 @@ class Factory
             }
         }
 
-        throw new MapperException('No source set!');
+        throw new ModuleException('No source set!');
+    }
+
+    protected function getFormat(string $format): IParamFormat
+    {
+        switch ($format) {
+            case 'serialize':
+            case 'serial':
+            case 's':
+                return new ParamsFormat\Serialize();
+            case 'json':
+            case 'js':
+            case 'j':
+                return new ParamsFormat\Json();
+            case 'http':
+            case 'web':
+            case 'w':
+            default:
+                return new ParamsFormat\Http();
+        }
     }
 }
