@@ -5,8 +5,10 @@ namespace kalanis\kw_modules\ModulesLists\File;
 
 use kalanis\kw_files\FilesException;
 use kalanis\kw_files\Interfaces\IProcessFiles;
+use kalanis\kw_modules\Interfaces\IMdTranslations;
 use kalanis\kw_modules\Interfaces\Lists\IFile;
 use kalanis\kw_modules\ModuleException;
+use kalanis\kw_modules\Traits\TMdLang;
 use kalanis\kw_paths\Interfaces\IPaths;
 use kalanis\kw_paths\PathsException;
 
@@ -17,6 +19,8 @@ use kalanis\kw_paths\PathsException;
  */
 class Files implements IFile
 {
+    use TMdLang;
+
     /** @var IProcessFiles */
     protected $files = null;
     /** @var string[] */
@@ -27,9 +31,11 @@ class Files implements IFile
     /**
      * @param IProcessFiles $files
      * @param string[] $moduleConfPath
+     * @param IMdTranslations|null $lang
      */
-    public function __construct(IProcessFiles $files, array $moduleConfPath)
+    public function __construct(IProcessFiles $files, array $moduleConfPath, ?IMdTranslations $lang = null)
     {
+        $this->setMdLang($lang);
         $this->moduleConfPath = $moduleConfPath;
         $this->files = $files;
     }
@@ -47,7 +53,7 @@ class Files implements IFile
             $data = $this->files->readFile($this->getPath());
             return is_resource($data) ? strval(stream_get_contents($data, -1, 0)) : strval($data);
         } catch (FilesException | PathsException $ex) {
-            throw new ModuleException('Problem with storage load', 0, $ex);
+            throw new ModuleException($this->getMdLang()->mdStorageLoadProblem(), 0, $ex);
         }
     }
 
@@ -56,7 +62,7 @@ class Files implements IFile
         try {
             return $this->files->saveFile($this->getPath(), $records);
         } catch (FilesException | PathsException $ex) {
-            throw new ModuleException('Problem with storage save', 0, $ex);
+            throw new ModuleException($this->getMdLang()->mdStorageSaveProblem(), 0, $ex);
         }
     }
 
@@ -67,7 +73,7 @@ class Files implements IFile
     protected function getPath(): array
     {
         if (empty($this->path)) {
-            throw new ModuleException('Path to config is not set!');
+            throw new ModuleException($this->getMdLang()->mdConfPathNotSet());
         }
         return $this->path;
     }

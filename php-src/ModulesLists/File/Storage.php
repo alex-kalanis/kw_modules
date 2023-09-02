@@ -3,8 +3,10 @@
 namespace kalanis\kw_modules\ModulesLists\File;
 
 
+use kalanis\kw_modules\Interfaces\IMdTranslations;
 use kalanis\kw_modules\Interfaces\Lists\IFile;
 use kalanis\kw_modules\ModuleException;
+use kalanis\kw_modules\Traits\TMdLang;
 use kalanis\kw_paths\Interfaces\IPaths;
 use kalanis\kw_paths\Stuff;
 use kalanis\kw_storage\Interfaces\IStorage as IKwStorage;
@@ -17,6 +19,8 @@ use kalanis\kw_storage\StorageException;
  */
 class Storage implements IFile
 {
+    use TMdLang;
+
     /** @var IKwStorage */
     protected $storage = null;
     /** @var string */
@@ -24,8 +28,9 @@ class Storage implements IFile
     /** @var string */
     protected $path = '';
 
-    public function __construct(IKwStorage $storage, string $moduleConfPath)
+    public function __construct(IKwStorage $storage, string $moduleConfPath, ?IMdTranslations $lang = null)
     {
+        $this->setMdLang($lang);
         $this->moduleConfPath = $moduleConfPath;
         $this->storage = $storage;
     }
@@ -44,7 +49,7 @@ class Storage implements IFile
             $data = $this->storage->read($this->getPath());
             return is_resource($data) ? strval(stream_get_contents($data, -1, 0)) : strval($data);
         } catch (StorageException $ex) {
-            throw new ModuleException('Problem with storage load', 0, $ex);
+            throw new ModuleException($this->getMdLang()->mdStorageLoadProblem(), 0, $ex);
         }
     }
 
@@ -53,7 +58,7 @@ class Storage implements IFile
         try {
             return $this->storage->write($this->getPath(), $records);
         } catch (StorageException $ex) {
-            throw new ModuleException('Problem with storage save', 0, $ex);
+            throw new ModuleException($this->getMdLang()->mdStorageSaveProblem(), 0, $ex);
         }
     }
 
@@ -64,7 +69,7 @@ class Storage implements IFile
     protected function getPath(): string
     {
         if (empty($this->path)) {
-            throw new ModuleException('Site part and then file name is not set!');
+            throw new ModuleException($this->getMdLang()->mdStorageTargetNotSet());
         }
         return $this->path;
     }

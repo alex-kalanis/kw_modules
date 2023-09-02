@@ -8,6 +8,7 @@ use kalanis\kw_files\FilesException;
 use kalanis\kw_files\Interfaces\IFLTranslations;
 use kalanis\kw_files\Interfaces\IProcessFiles;
 use kalanis\kw_modules\Interfaces\ILoader;
+use kalanis\kw_modules\Interfaces\IMdTranslations;
 use kalanis\kw_modules\Interfaces\Lists\File\IParamFormat;
 use kalanis\kw_modules\Interfaces\Lists\IModulesList;
 use kalanis\kw_modules\ModuleException;
@@ -15,6 +16,7 @@ use kalanis\kw_modules\ModulesLists\File;
 use kalanis\kw_modules\ModulesLists\ParamsFormat;
 use kalanis\kw_modules\Loaders;
 use kalanis\kw_modules\Mixer\Processor;
+use kalanis\kw_modules\Traits\TMdLang;
 use kalanis\kw_paths\PathsException;
 use kalanis\kw_storage\Access\Factory as storage_factory;
 use kalanis\kw_storage\Interfaces\IStorage;
@@ -29,6 +31,13 @@ use kalanis\kw_storage\StorageException;
  */
 class Factory
 {
+    use TMdLang;
+
+    public function __construct(?IMdTranslations $lang = null)
+    {
+        $this->setMdLang($lang);
+    }
+
     /**
      * @param mixed $params
      * @throws ModuleException
@@ -36,7 +45,7 @@ class Factory
      */
     public function getProcessor($params): Processor
     {
-        return new Processor($this->getLoader($params), $this->getModulesList($params));
+        return new Processor($this->getLoader($params), $this->getModulesList($params), $this->getMdLang());
     }
 
     /**
@@ -78,14 +87,14 @@ class Factory
             }
             switch ($params) {
                 case 'admin':
-                    return new Loaders\KwAdminLoader();
+                    return new Loaders\KwAdminLoader($this->getMdLang());
                 case 'api':
-                    return new Loaders\KwApiLoader();
+                    return new Loaders\KwApiLoader($this->getMdLang());
                 case 'web':
-                    return new Loaders\KwLoader();
+                    return new Loaders\KwLoader($this->getMdLang());
             }
         }
-        throw new ModuleException('No loader set!');
+        throw new ModuleException($this->getMdLang()->mdNoLoaderSet());
     }
 
     /**
@@ -100,25 +109,26 @@ class Factory
                 return $params;
             }
             if ($params instanceof IStorage) {
-                return new File(new File\Storage($params, ''), new ParamsFormat\Http());
+                return new File(new File\Storage($params, '', $this->getMdLang()), new ParamsFormat\Http());
             }
             if ($params instanceof IProcessFiles) {
-                return new File(new File\Files($params, []), new ParamsFormat\Http());
+                return new File(new File\Files($params, [], $this->getMdLang()), new ParamsFormat\Http());
             }
         }
         if (is_array($params)) {
             if (isset($params['modules_source'])) {
                 return $this->getModulesList($params['modules_source']);
             }
+            $mdLang = isset($params['modules_lang']) && is_object($params['modules_lang']) && ($params['modules_lang'] instanceof IMdTranslations) ? $params['modules_lang'] : $this->getMdLang();
+            $format = isset($params['modules_param_format']) ? $this->getFormat($params['modules_param_format']) : new ParamsFormat\Http();
             try {
-                $format = isset($params['modules_param_format']) ? $this->getFormat($params['modules_param_format']) : new ParamsFormat\Http();
                 if (isset($params['storage_path'])) {
                     $lang = isset($params['lang']) && is_object($params['lang']) && ($params['lang'] instanceof IStTranslations) ? $params['lang'] : null;
-                    return new File(new File\Storage((new storage_factory($lang))->getStorage($params), $params['storage_path']), $format);
+                    return new File(new File\Storage((new storage_factory($lang))->getStorage($params), $params['storage_path'], $mdLang), $format);
                 }
                 if (isset($params['files_path'])) {
                     $lang = isset($params['lang']) && is_object($params['lang']) && ($params['lang'] instanceof IFLTranslations) ? $params['lang'] : null;
-                    return new File(new File\Files((new files_factory($lang))->getClass($params), $params['files_path']), $format);
+                    return new File(new File\Files((new files_factory($lang))->getClass($params), $params['files_path'], $mdLang), $format);
                 }
             } catch (FilesException | PathsException | StorageException $ex) {
                 throw new ModuleException($ex->getMessage(), $ex->getCode(), $ex);
@@ -137,7 +147,7 @@ class Factory
             }
         }
 
-        throw new ModuleException('No source set!');
+        throw new ModuleException($this->getMdLang()->mdNoSourceSet());
     }
 
     protected function getFormat(string $format): IParamFormat

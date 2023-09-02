@@ -5,6 +5,7 @@ namespace kalanis\kw_modules\Mixer;
 
 use kalanis\kw_input\Interfaces\IFiltered;
 use kalanis\kw_modules\Interfaces\ILoader;
+use kalanis\kw_modules\Interfaces\IMdTranslations;
 use kalanis\kw_modules\Interfaces\Lists\IModulesList;
 use kalanis\kw_modules\Interfaces\Lists\ISitePart;
 use kalanis\kw_modules\ModulesLists;
@@ -26,11 +27,11 @@ class Processor
     /** @var Parser\GetModules */
     protected $parser = null;
 
-    public function __construct(ILoader $loader, IModulesList $files)
+    public function __construct(ILoader $loader, IModulesList $files, ?IMdTranslations $lang = null)
     {
         $this->loader = $loader;
         $this->files = $files;
-        $this->parser = new Parser\GetModules();
+        $this->parser = new Parser\GetModules($lang);
     }
 
     /**

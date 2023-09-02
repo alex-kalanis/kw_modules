@@ -5,8 +5,10 @@ namespace kalanis\kw_modules\Loaders;
 
 use kalanis\kw_autoload\AutoloadException;
 use kalanis\kw_modules\Interfaces\ILoader;
+use kalanis\kw_modules\Interfaces\IMdTranslations;
 use kalanis\kw_modules\Interfaces\IModule;
 use kalanis\kw_modules\ModuleException;
+use kalanis\kw_modules\Traits\TMdLang;
 
 
 /**
@@ -22,13 +24,16 @@ use kalanis\kw_modules\ModuleException;
  */
 abstract class AKwLoader implements ILoader
 {
-    public function __construct()
+    use TMdLang;
+
+    public function __construct(?IMdTranslations $lang = null)
     {
         if (class_exists('\kalanis\kw_autoload\Autoload')) {
             \kalanis\kw_autoload\Autoload::addPath('%2$s%1$smodules%1$s%5$s%1$sphp-src%1$s%6$s');
             \kalanis\kw_autoload\Autoload::addPath('%2$s%1$smodules%1$s%5$s%1$ssrc%1$s%6$s');
             \kalanis\kw_autoload\Autoload::addPath('%2$s%1$smodules%1$s%5$s%1$s%6$s');
         }
+        $this->setMdLang($lang);
     }
 
     public function load(array $module, array $constructParams = []): ?IModule
@@ -39,7 +44,7 @@ abstract class AKwLoader implements ILoader
             $reflection = new \ReflectionClass($classPath);
             $module = $reflection->newInstanceArgs($constructParams);
             if (!$module instanceof IModule) {
-                throw new ModuleException(sprintf('Class *%s* is not instance of IModule - check interface or query', $classPath));
+                throw new ModuleException($this->getMdLang()->mdNotInstanceOfIModule($classPath));
             }
             return $module;
         } catch (AutoloadException | \ReflectionException $ex) {

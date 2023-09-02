@@ -4,6 +4,7 @@ namespace kalanis\kw_modules\Loaders;
 
 
 use kalanis\kw_modules\ModuleException;
+use kalanis\kw_modules\Traits\TMdLang;
 
 
 /**
@@ -13,6 +14,8 @@ use kalanis\kw_modules\ModuleException;
  */
 trait TSeparate
 {
+    use TMdLang;
+
     /**
      * @param string[] $path
      * @param string|null $emptyDefault
@@ -22,7 +25,7 @@ trait TSeparate
     protected function separateModule(array $path, ?string $emptyDefault = null): array
     {
         if (empty($path)) {
-            throw new ModuleException('No module found');
+            throw new ModuleException($this->getMdLang()->mdNoModuleFound());
         }
 
         $target = strval(reset($path));

@@ -4,8 +4,10 @@ namespace kalanis\kw_modules\Loaders;
 
 
 use kalanis\kw_modules\Interfaces\ILoader;
+use kalanis\kw_modules\Interfaces\IMdTranslations;
 use kalanis\kw_modules\Interfaces\IModule;
 use kalanis\kw_modules\ModuleException;
+use kalanis\kw_modules\Traits\TMdLang;
 use Psr\Container\ContainerInterface;
 
 
@@ -20,11 +22,14 @@ use Psr\Container\ContainerInterface;
  */
 abstract class ADiLoader implements ILoader
 {
+    use TMdLang;
+
     /** @var ContainerInterface */
     protected $container = null;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, ?IMdTranslations $lang = null)
     {
+        $this->setMdLang($lang);
         $this->container = $container;
     }
 
@@ -34,7 +39,7 @@ abstract class ADiLoader implements ILoader
         if ($this->container->has($classPath)) {
             $module = $this->container->get($classPath);
             if (!$module instanceof IModule) {
-                throw new ModuleException(sprintf('Class *%s* is not instance of IModule - check interface or query', $classPath));
+                throw new ModuleException($this->getMdLang()->mdNotInstanceOfIModule($classPath));
             }
             return $module;
         }

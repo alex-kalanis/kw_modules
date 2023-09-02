@@ -3,8 +3,10 @@
 namespace kalanis\kw_modules\Parser;
 
 
+use kalanis\kw_modules\Interfaces\IMdTranslations;
 use kalanis\kw_modules\ModuleException;
 use kalanis\kw_modules\Support;
+use kalanis\kw_modules\Traits\TMdLang;
 use kalanis\kw_paths\Stuff;
 
 
@@ -37,10 +39,17 @@ use kalanis\kw_paths\Stuff;
  */
 class GetModules
 {
+    use TMdLang;
+
     /** @var string */
     protected $content = '';
     /** @var array<string, Record> */
     protected $foundModules = [];
+
+    public function __construct(?IMdTranslations $lang = null)
+    {
+        $this->setMdLang($lang);
+    }
 
     public function setContent(string $content): self
     {
@@ -93,7 +102,7 @@ class GetModules
                 $stack[] = $rest[$i];
             } else {
                 if ($stack->isEmpty()) {
-                    throw new ModuleException(sprintf('No opening tag in stack to compare!'));
+                    throw new ModuleException($this->getMdLang()->mdNoOpeningTag());
                 }
                 // check if it's ending for that tag
                 /** @var Positioned $top */
@@ -101,7 +110,7 @@ class GetModules
                 $clear = Support::clearModuleName($rest[$i]->getInner());
                 if ($top->getInner() != $clear) {
                     // todo: now just lookup for top one, in future try to look deeper if the correct match is somewhere there
-                    throw new ModuleException(sprintf('No ending tag for module *%s*', $top->getInner()));
+                    throw new ModuleException($this->getMdLang()->mdNoEndingTag($top->getInner()));
                 }
                 $stack->pop();
 
