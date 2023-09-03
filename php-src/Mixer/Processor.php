@@ -39,10 +39,11 @@ class Processor
      * @param IFiltered $inputs
      * @param int $level
      * @param array<int, string|int|float|bool> $sharedParams
+     * @param array<string, string|int|float|bool|object> $constructParams params passed into __construct
      * @throws ModuleException
      * @return string
      */
-    public function fill(string $content, IFiltered $inputs, int $level, array $sharedParams = []): string
+    public function fill(string $content, IFiltered $inputs, int $level, array $sharedParams = [], array $constructParams = []): string
     {
         $this->files->setModuleLevel($level);
         $this->parser->setContent($content)->process();
@@ -60,7 +61,7 @@ class Processor
                 }
 
                 // known, enabled -> will process
-                $module = $this->loader->load($item->getModulePath());
+                $module = $this->loader->load($item->getModulePath(), $constructParams);
                 if ($module) {
                     $module->init($inputs, array_merge(
                         $sharedParams,
