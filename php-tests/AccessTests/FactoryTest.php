@@ -44,12 +44,12 @@ class FactoryTest extends CommonTestClass
             [['modules_loaders' => new XLoader(), 'modules_param_format' => 'serialize', 'storage_path' => 'somewhere']],
             [['modules_loaders' => new XLoader(), 'modules_param_format' => 'serial', 'storage_path' => 'somewhere']],
             [['modules_loaders' => new XLoader(), 'modules_param_format' => 's', 'storage_path' => 'somewhere']],
-            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'json', 'storage_path' => 'somewhere']],
-            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'js', 'storage_path' => 'somewhere']],
-            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'j', 'storage_path' => 'somewhere']],
-            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'http', 'storage_path' => 'somewhere']],
-            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'web', 'storage_path' => 'somewhere']],
-            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'w', 'storage_path' => 'somewhere']],
+            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'json', 'volume_path' => 'somewhere']],
+            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'js', 'volume_path' => 'somewhere']],
+            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'j', 'volume_path' => 'somewhere']],
+            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'http', 'volume_path' => 'somewhere']],
+            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'web', 'volume_path' => 'somewhere']],
+            [['modules_loaders' => new XLoader(), 'modules_param_format' => 'w', 'volume_path' => 'somewhere']],
         ];
     }
 

@@ -130,6 +130,9 @@ class Factory
                     $lang = isset($params['lang']) && is_object($params['lang']) && ($params['lang'] instanceof IFLTranslations) ? $params['lang'] : null;
                     return new File(new File\Files((new files_factory($lang))->getClass($params), $params['files_path'], $mdLang), $format);
                 }
+                if (isset($params['volume_path'])) {
+                    return new File(new File\Volume($params['volume_path'], $mdLang), $format);
+                }
             } catch (FilesException | PathsException | StorageException $ex) {
                 throw new ModuleException($ex->getMessage(), $ex->getCode(), $ex);
             }
