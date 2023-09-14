@@ -15,6 +15,7 @@ parameters:
 		- '#Parameter \#1 \$va[rl]u?e? of function [si][tn][rt]val expects bool\|float\|int\|resource\|string\|null#'
 		# kw_autoloader not included
 		- '#Caught class kalanis\\kw_autoload\\AutoloadException not found#'
+		- '#Call to static method getInstance\(\) on an unknown class#'
 		# Param unpacks
 		- '#should return array\<int\|string, array\<int\|string\>\|bool\|float\|int\|string\> but returns mixed\.#'
 	treatPhpDocTypesAsCertain: false
