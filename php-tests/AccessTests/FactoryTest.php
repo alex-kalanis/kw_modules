@@ -34,7 +34,7 @@ class FactoryTest extends CommonTestClass
         return [
             [['modules_loaders' => new XLoader(), 'modules_source' => new XSourceList()]],
             [['modules_loaders' => [
-                'api', 'admin', 'web', // string select
+                'api', 'admin', 'web', 'di-api', 'di-admin', 'di-web', // string select
                 XLoader::class, // known class
                 123 // will be skipped - this one fails
             ], 'modules_source' => new XSourceList()]],
