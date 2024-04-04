@@ -70,12 +70,12 @@ class FilesTest extends CommonTestClass
 
 class XFiles implements IProcessFiles
 {
-    public function saveFile(array $entry, $content, ?int $offset = null): bool
+    public function saveFile(array $entry, string $content, ?int $offset = null, int $mode = 0): bool
     {
         return true;
     }
 
-    public function readFile(array $entry, ?int $offset = null, ?int $length = null)
+    public function readFile(array $entry, ?int $offset = null, ?int $length = null): string
     {
         return 'mock ok';
     }
@@ -99,23 +99,21 @@ class XFiles implements IProcessFiles
 
 class XStreamFiles extends XFiles
 {
-    public function readFile(array $entry, ?int $offset = null, ?int $length = null)
+    public function readFile(array $entry, ?int $offset = null, ?int $length = null): string
     {
-        $str = fopen('php://memory', 'r+');
-        fwrite($str, 'mock ok');
-        return $str;
+        return 'mock ok';
     }
 }
 
 
 class XDeadFiles extends XFiles
 {
-    public function saveFile(array $entry, $content, ?int $offset = null): bool
+    public function saveFile(array $entry, string $content, ?int $offset = null, int $mode = 0): bool
     {
         throw new FilesException('mock');
     }
 
-    public function readFile(array $entry, ?int $offset = null, ?int $length = null)
+    public function readFile(array $entry, ?int $offset = null, ?int $length = null): string
     {
         throw new FilesException('mock');
     }

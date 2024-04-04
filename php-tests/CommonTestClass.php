@@ -27,9 +27,9 @@ class XStorage implements IKwStorage
         return isset($this->dummy[$key]);
     }
 
-    public function read(string $key)
+    public function read(string $key): string
     {
-        return $this->dummy[$key] ?? null ;
+        return $this->dummy[$key] ?? '';
     }
 
     public function write(string $key, $data, ?int $timeout = null): bool

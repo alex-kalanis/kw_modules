@@ -81,7 +81,7 @@ class XStorage implements IStorage
         return true;
     }
 
-    public function read(string $sharedKey)
+    public function read(string $sharedKey): string
     {
         return 'mock ok';
     }
@@ -125,11 +125,9 @@ class XStorage implements IStorage
 
 class XStreamStorage extends XStorage
 {
-    public function read(string $sharedKey)
+    public function read(string $sharedKey): string
     {
-        $str = fopen('php://memory', 'r+');
-        fwrite($str, 'mock ok');
-        return $str;
+        return 'mock ok';
     }
 }
 
@@ -141,7 +139,7 @@ class XDeadStorage extends XStorage
         throw new StorageException('mock');
     }
 
-    public function read(string $sharedKey)
+    public function read(string $sharedKey): string
     {
         throw new StorageException('mock');
     }

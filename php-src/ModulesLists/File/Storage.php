@@ -21,12 +21,9 @@ class Storage implements IFile
 {
     use TMdLang;
 
-    /** @var IKwStorage */
-    protected $storage = null;
-    /** @var string */
-    protected $moduleConfPath = '';
-    /** @var string */
-    protected $path = '';
+    protected IKwStorage $storage;
+    protected string $moduleConfPath = '';
+    protected string $path = '';
 
     public function __construct(IKwStorage $storage, string $moduleConfPath, ?IMdTranslations $lang = null)
     {

@@ -5,14 +5,11 @@
   "source": "https://github.com/alex-kalanis/kw_modules",
   "license": "BSD-3-Clause",
   "require": {
-    "alex-kalanis/kw_address_handler": "dev-master",
-    "alex-kalanis/kw_auth": "dev-master",
-    "alex-kalanis/kw_confs": "dev-master",
     "alex-kalanis/kw_input": "dev-master",
     "alex-kalanis/kw_paths": "dev-master",
     "alex-kalanis/kw_storage": "dev-master",
-    "alex-kalanis/kw_templates": "dev-master",
-    "php": ">=7.2.0"
+    "alex-kalanis/kw_files": "dev-master",
+    "php": ">=7.4.0"
   },
   "suggest": {
   },

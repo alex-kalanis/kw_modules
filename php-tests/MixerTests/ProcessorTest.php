@@ -4,7 +4,7 @@ namespace MixerTests;
 
 
 use CommonTestClass;
-use kalanis\kw_input\Filtered\SimpleArrays;
+use kalanis\kw_input\Filtered\SimpleFromArrays;
 use kalanis\kw_input\Interfaces\IFiltered;
 use kalanis\kw_modules\Interfaces;
 use kalanis\kw_modules\Mixer\Processor;
@@ -59,7 +59,7 @@ class ProcessorTest extends CommonTestClass
 
     protected function getFilter(): IFiltered
     {
-        return new SimpleArrays([]);
+        return new SimpleFromArrays([]);
     }
 }
 

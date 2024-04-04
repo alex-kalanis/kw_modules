@@ -133,12 +133,12 @@ class XSourceList implements IModulesList
 
 class XProcFiles implements IProcessFiles
 {
-    public function saveFile(array $entry, $content, ?int $offset = null): bool
+    public function saveFile(array $entry, string $content, ?int $offset = null, int $mode = 0): bool
     {
         return false;
     }
 
-    public function readFile(array $entry, ?int $offset = null, ?int $length = null)
+    public function readFile(array $entry, ?int $offset = null, ?int $length = null): string
     {
         throw new FilesException('mock die');
     }

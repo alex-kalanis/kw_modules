@@ -21,12 +21,11 @@ class Files implements IFile
 {
     use TMdLang;
 
-    /** @var IProcessFiles */
-    protected $files = null;
+    protected IProcessFiles $files;
     /** @var string[] */
-    protected $moduleConfPath = [];
+    protected array $moduleConfPath = [];
     /** @var string[] */
-    protected $path = [];
+    protected array $path = [];
 
     /**
      * @param IProcessFiles $files
