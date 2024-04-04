@@ -49,8 +49,7 @@ class Files implements IFile
     public function load(): string
     {
         try {
-            $data = $this->files->readFile($this->getPath());
-            return is_resource($data) ? strval(stream_get_contents($data, -1, 0)) : strval($data);
+            return $this->files->readFile($this->getPath());
         } catch (FilesException | PathsException $ex) {
             throw new ModuleException($this->getMdLang()->mdStorageLoadProblem(), 0, $ex);
         }

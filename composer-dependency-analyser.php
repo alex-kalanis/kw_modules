@@ -16,4 +16,6 @@ return $config
     ->ignoreErrorsOnPackageAndPath('alex-kalanis/kw_files', __DIR__ . '/php-src/ModulesLists/File/Files.php', [ErrorType::DEV_DEPENDENCY_IN_PROD])
     ->ignoreErrorsOnPackageAndPath('alex-kalanis/kw_storage', __DIR__ . '/php-src/Access/Factory.php', [ErrorType::DEV_DEPENDENCY_IN_PROD])
     ->ignoreErrorsOnPackageAndPath('alex-kalanis/kw_files', __DIR__ . '/php-src/Access/Factory.php', [ErrorType::DEV_DEPENDENCY_IN_PROD])
+    ->ignoreErrorsOnPackageAndPath('psr/container', __DIR__ . '/php-src/Loaders/Di/ALoader.php', [ErrorType::DEV_DEPENDENCY_IN_PROD])
+    ->ignoreUnknownClasses(['kalanis\kw_autoload\Autoload', 'kalanis\kw_autoload\AutoloadException', 'kalanis\kw_autoload\DependencyInjection'])
 ;

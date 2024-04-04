@@ -43,8 +43,7 @@ class Storage implements IFile
     public function load(): string
     {
         try {
-            $data = $this->storage->read($this->getPath());
-            return is_resource($data) ? strval(stream_get_contents($data, -1, 0)) : strval($data);
+            return $this->storage->read($this->getPath());
         } catch (StorageException $ex) {
             throw new ModuleException($this->getMdLang()->mdStorageLoadProblem(), 0, $ex);
         }
