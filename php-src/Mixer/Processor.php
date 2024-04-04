@@ -20,14 +20,10 @@ use kalanis\kw_modules\Parser;
  */
 class Processor
 {
-    /** @var ILoader */
-    protected $loader = null;
-    /** @var IModulesList */
-    protected $files = null;
-    /** @var Parser\GetModules */
-    protected $parser = null;
-    /** @var PassedParams\Factory */
-    protected $paramsFactory = null;
+    protected ILoader $loader;
+    protected IModulesList $files;
+    protected Parser\GetModules $parser;
+    protected PassedParams\Factory $paramsFactory;
 
     public function __construct(ILoader $loader, IModulesList $files, ?IMdTranslations $lang = null, ?Parser\GetModules $parser = null)
     {
