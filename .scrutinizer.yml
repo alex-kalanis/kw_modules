@@ -7,6 +7,7 @@ filter:
   paths: {  }
 
 build:
+  image: default-bionic
   environment:
     php:
       version: '7.4'
