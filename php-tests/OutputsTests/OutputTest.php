@@ -64,6 +64,14 @@ class OutputTest extends CommonTestClass
         $this->assertFalse($lib->canWrap());
     }
 
+    public function testJsonErrorStructure(): void
+    {
+        $lib = new Output\JsonError();
+        $lib->setContentStructure(987, ['cannot happen', 'its impossible']);
+        $this->assertEquals('{"code":987,"message":["cannot happen","its impossible"]}', (string) $lib);
+        $this->assertFalse($lib->canWrap());
+    }
+
     public function mockCallback(): string
     {
         return 'from callback';
